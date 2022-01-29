@@ -1,0 +1,25 @@
+{
+  "name": "music-singer-bot",
+  "description": "Telegram bot that responds to you with the following line from the song",
+  "author": "Daniil Chervyakov",
+  "license": "ISC",
+  "version": "1.0.0",
+  "type": "commonjs",
+  "scripts": {
+    "lint": "eslint .",
+    "deploy": "gcloud beta functions deploy telegramBotWebhook --region=us-central1 --env-vars-file .env.yaml --runtime nodejs16 --trigger-http"
+  },
+  "engines": {
+    "node": "16"
+  },
+  "main": "index.js",
+  "dependencies": {
+    "axios": "^0.25.0",
+    "cheerio": "^1.0.0-rc.10",
+    "telegraf": "^4.6.0"
+  },
+  "devDependencies": {
+    "eslint": "^7.6.0",
+    "eslint-config-google": "^0.14.0"
+  }
+}
