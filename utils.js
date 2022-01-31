@@ -21,7 +21,8 @@ module.exports.getLyrics = function(content) {
   return lyrics;
 };
 
-const PUNCTUATION_REGEX = new RegExp(/[\p{P}$+<=>^`|~—]+/, 'gui');
+const PUNCTUATION_REGEX = new RegExp(/[\p{P}$+<=>^`|~—]+/, 'gu');
+const SPACE_REGEX = new RegExp(/\s+/, 'g');
 
 /**
  * Replace all punctuation symbols and converted to lower case.
@@ -29,7 +30,10 @@ const PUNCTUATION_REGEX = new RegExp(/[\p{P}$+<=>^`|~—]+/, 'gui');
  * @return {string}
  */
 function sanitizeString(str) {
-  return str.replace(PUNCTUATION_REGEX, '').toLocaleLowerCase().trim();
+  return str
+      .replace(PUNCTUATION_REGEX, '')
+      .replace(SPACE_REGEX, ' ')
+      .toLocaleLowerCase().trim();
 }
 module.exports.sanitizeString = sanitizeString;
 
@@ -49,5 +53,3 @@ module.exports.getLyricsRows = function(lyrics) {
     return acc;
   }, []);
 };
-
-
