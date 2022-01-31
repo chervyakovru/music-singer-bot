@@ -1,6 +1,6 @@
 const {Telegraf} = require('telegraf');
 const axios = require('axios').default;
-const {getLyrics} = require('./utils.js');
+const {getLyrics, getLyricsRows, sanitizeString} = require('./utils.js');
 
 const {
   GOOGLE_CLOUD_PROJECT_ID,
@@ -10,52 +10,48 @@ const {
 } = process.env;
 
 const getGeniusURL = (url) => `https://api.genius.com/${url}`;
-const STRING_REGEX = new RegExp(/^\p{Letter}+.*$/, 'gmu');
 const NOT_FOUND_MESSAGE = 'I didn\'t find it 😞';
 
 const bot = new Telegraf(TELEGRAM_BOT_TOKEN);
 
 bot.start((ctx) =>
   ctx.reply(
-      'Welcome to the Music Singer Bot!' +
-      'you can send string of your favorite song and i return you next'),
+      'Welcome to the Music Singer Bot!\n' +
+      'You can send string of your favorite song and i return you next.\n' +
+      'I can work with all languages of the world 🌎'),
 );
 bot.help((ctx) =>
-  ctx.reply('Just send me string of favorite song and i return you next'),
+  ctx.reply('Just send me string of favorite song and i return you next.'),
 );
 bot.on('text', async (ctx) => {
-  const message = ctx.message.text.toLocaleLowerCase().trim();
+  const message = sanitizeString(ctx.message.text);
   const search = await axios.get(
       getGeniusURL(`search?q=${encodeURI(message)}`),
-      {
-        headers: {Authorization: `Bearer ${GENIUS_TOKEN}`},
-      },
+      {headers: {Authorization: `Bearer ${GENIUS_TOKEN}`}},
   );
 
   const {url} = search.data.response.hits[0].result;
   const page = await axios.get(url);
 
   const lyrics = getLyrics(page.data);
+  const lyricsRows = getLyricsRows(lyrics);
 
-  const lowerCaseLyrics = lyrics.toLocaleLowerCase();
-  const indexOfMessage = lowerCaseLyrics.indexOf(message);
-  if (indexOfMessage === -1) {
+  const targetRow = lyricsRows
+      .find((row) => row.sanitizeRow.indexOf(message) !== -1);
+
+  if (targetRow === undefined) {
     ctx.reply(NOT_FOUND_MESSAGE);
     return;
   }
 
-  const matchNextString = lyrics
-      .substring(indexOfMessage + message.length)
-      .match(STRING_REGEX);
-  if (matchNextString === null) {
+  const nextRow = lyricsRows[targetRow.index + 1];
+  if (nextRow === undefined) {
     ctx.reply(NOT_FOUND_MESSAGE);
     return;
   }
 
-  const answer = matchNextString[0].trim();
+  const answer = nextRow.row;
 
-  console.log('lyrics: ', lyrics);
-  console.log('==========');
   console.log('ctx.message.text: ', ctx.message.text);
   console.log('answer: ', answer);
 

@@ -20,3 +20,34 @@ module.exports.getLyrics = function(content) {
   });
   return lyrics;
 };
+
+const PUNCTUATION_REGEX = new RegExp(/[\p{P}—]+/, 'gu');
+
+/**
+ * Replace all punctuation symbols and converted to lower case.
+ * @param {string} str
+ * @return {string}
+ */
+function sanitizeString(str) {
+  return str.replace(PUNCTUATION_REGEX, '').toLocaleLowerCase().trim();
+}
+module.exports.sanitizeString = sanitizeString;
+
+/**
+ * Convert plain lyrics to rows
+ * @param {string} lyrics
+ * @return {Array<{row: string, sanitizeRow: string, index: number}>}
+ */
+module.exports.getLyricsRows = function(lyrics) {
+  return lyrics.split('\n').filter((row) => {
+    const isEmpty = row.length === 0;
+    const isTitle = row.startsWith('[');
+    return !isEmpty && !isTitle;
+  }).reduce((acc, row, index) => {
+    const sanitizeRow = sanitizeString(row);
+    acc.push({row, sanitizeRow, index});
+    return acc;
+  }, []);
+};
+
+
