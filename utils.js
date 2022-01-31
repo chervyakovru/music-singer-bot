@@ -21,7 +21,7 @@ module.exports.getLyrics = function(content) {
   return lyrics;
 };
 
-const PUNCTUATION_REGEX = new RegExp(/[\p{P}—]+/, 'gu');
+const PUNCTUATION_REGEX = new RegExp(/[\p{P}$+<=>^`|~—]+/, 'gui');
 
 /**
  * Replace all punctuation symbols and converted to lower case.
