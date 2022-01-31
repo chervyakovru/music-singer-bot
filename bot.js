@@ -40,12 +40,18 @@ bot.on('text', async (ctx) => {
       .find((row) => row.sanitizeRow.indexOf(message) !== -1);
 
   if (targetRow === undefined) {
+    console.log('ctx.message.text: ', ctx.message.text);
+    console.log('answer: ', NOT_FOUND_MESSAGE);
+
     ctx.reply(NOT_FOUND_MESSAGE);
     return;
   }
 
   const nextRow = lyricsRows[targetRow.index + 1];
   if (nextRow === undefined) {
+    console.log('ctx.message.text: ', ctx.message.text);
+    console.log('answer: ', NOT_FOUND_MESSAGE);
+
     ctx.reply(NOT_FOUND_MESSAGE);
     return;
   }
